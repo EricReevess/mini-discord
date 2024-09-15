@@ -1,0 +1,117 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  // uncomment next line if you use Prisma <5.10
+  // directUrl = env("DATABASE_URL_UNPOOLED")
+}
+
+// 用户信息
+model Profile {
+  id String @id @default(uuid())
+  userId String @unique
+  name String
+  imageUrl String @db.Text
+  email String @db.Text
+
+  createAt DateTime @default(now())
+  updateAt DateTime @updatedAt
+
+  // 用户创建的服务器
+  servers Server[]
+
+  // 用户是多个服务器上的成员
+  members Member[]
+
+  // 用户加入的频道
+  channels Channel[]
+}
+
+// 聊天服务器
+model Server {
+  id String @id @default(uuid())
+  name String
+  imageUrl String @db.Text
+  inviteCode String @db.Text
+
+  // 定义外键 profileId, 服务器属于哪个用户
+  profileId String
+  // profile Profile @relation 定义与外键的关系
+  // fields: [profileId] 声明 profileId 是外键字段
+  // references: [id] 声明 profileId 是以 Profile 中 id 做 引用字段
+  // onDelete: Cascade 代表级联删除，也就是说如果关联的Profile 被删除，那么此Server也会被删除
+  profile Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  // 当前服务器下拥有多个成员 one to more
+  members Member[]
+  channels Channel[]
+
+  createAt DateTime @default(now())
+  updateAt DateTime @updatedAt
+
+  // 在profileId上创建一个索引，优化通过profileId查询Profile的性能
+  @@index([profileId])
+}
+
+// 成员角色枚举
+enum MemberRole {
+  ADMIN
+  MODERATOR
+  GUEST
+}
+
+model Member {
+  id String @id @default(uuid())
+  role MemberRole @default(GUEST)
+
+  // 成员是谁，成员对应的用户信息id
+  profileId String
+  profile Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  // 成员属于哪个服务器
+  serverId String
+  server Server @relation(fields: [serverId], references: [id], onDelete: Cascade )
+
+  createAt DateTime @default(now())
+  updateAt DateTime @updatedAt
+
+  @@index([profileId])
+  @@index([serverId])
+  
+}
+
+enum ChannelType {
+  TEXT
+  AUDIO
+  VEDIO
+}
+
+model Channel {
+  id String @id @default(uuid())
+  name String
+  type ChannelType @default(TEXT)
+
+  // 谁创建了频道
+  profileId String
+  profile Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  // 频道属于哪个服务器
+  serverId String
+  server Server @relation(fields: [serverId], references: [id], onDelete: Cascade )
+
+  createAt DateTime @default(now())
+  updateAt DateTime @updatedAt
+
+  @@index([profileId])
+  @@index([serverId])
+
+}
