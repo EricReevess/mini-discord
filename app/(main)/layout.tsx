@@ -1,4 +1,4 @@
-import NavigationSidebar from '@/components/navigation-sidebar';
+import NavigationSidebar from '@/components/navigation-sidebar/navigation-sidebar';
 
 type Props = {
   children: React.ReactNode;

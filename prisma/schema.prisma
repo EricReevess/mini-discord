@@ -41,7 +41,7 @@ model Server {
   id String @id @default(uuid())
   name String
   imageUrl String @db.Text
-  inviteCode String @db.Text
+  inviteCode String @unique // 邀请码 作为查询 必须唯一
 
   // 定义外键 profileId, 服务器属于哪个用户
   profileId String
@@ -92,7 +92,7 @@ model Member {
 enum ChannelType {
   TEXT
   AUDIO
-  VEDIO
+  VIDEO
 }
 
 model Channel {

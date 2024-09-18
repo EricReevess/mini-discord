@@ -6,7 +6,7 @@ import Image from 'next/image';
 import { UploadDropzone } from '@/lib/uploadthing';
 
 import { OurFileRouter } from '@/app/api/uploadthing/core';
-import { useState } from 'react';
+// import { useState } from 'react';
 
 export interface Props {
   value?: string;

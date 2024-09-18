@@ -3,7 +3,6 @@
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -25,15 +24,11 @@ import FileUpload from '@/components/file-upload';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
-import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
-import { Profile } from '@prisma/client';
+import { ModalType, useModal } from '@/app/hooks/use-modal-store';
 import { LoaderCircle } from 'lucide-react';
-
-interface Props {
-  profile: Profile;
-}
+import { useEffect } from 'react';
 
 const formSchema = z.object({
   name: z
@@ -45,45 +40,51 @@ const formSchema = z.object({
   imageUrl: z.string().optional(),
 });
 
-const InitialModal = ({ profile }: Props) => {
+const EditServerModal = () => {
+  const { isOpen, type, onClose, data } = useModal();
+  const { server } = data;
+
+  const isModalOpen = isOpen && type === ModalType.EDIT_SERVER;
+
   const router = useRouter();
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      name: `${profile.name}的聊天服务器`,
+      name: '',
       imageUrl: '',
     },
   });
 
-  const isLoading = form.formState.isSubmitting;
-
-  const [isMounted, setIsMounted] = useState(false);
-
   useEffect(() => {
-    setIsMounted(true);
-  }, []);
+    if (server) {
+      form.setValue('name', server.name);
+      form.setValue('imageUrl', server.imageUrl);
+    }
+  }, [server, form]);
+
+  const isLoading = form.formState.isSubmitting;
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     console.log('values:', values);
     try {
-      await axios.post('/api/servers', values);
+      await axios.patch(`/api/servers/${server?.id}`, values);
       router.refresh();
-      window.location.reload();
+      onClose();
     } catch (error) {
       console.log('error:', error);
     }
   };
 
-  if (!isMounted) return null;
+  const handleClose = () => {
+    onClose();
+  };
 
   return (
-    <Dialog open>
+    <Dialog open={isModalOpen} onOpenChange={handleClose}>
       <DialogContent className='overflow-hidden bg-white text-slate-900'>
         <DialogHeader>
-          <DialogTitle>创建聊天服务器</DialogTitle>
-          <DialogDescription>
-            给你的聊天服务器取一个名字吧, 或者上传一个服务器头像
-          </DialogDescription>
+          <DialogTitle>编辑聊天服务器</DialogTitle>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-4'>
@@ -134,7 +135,7 @@ const InitialModal = ({ profile }: Props) => {
                 {isLoading && (
                   <LoaderCircle className='mr-1 h-4 w-4 animate-spin' />
                 )}
-                创建
+                保存
               </Button>
             </DialogFooter>
           </form>
@@ -144,4 +145,4 @@ const InitialModal = ({ profile }: Props) => {
   );
 };
 
-export default InitialModal;
+export default EditServerModal;
