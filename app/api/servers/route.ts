@@ -20,19 +20,15 @@ export async function POST(req: Request) {
         imageUrl,
         inviteCode: uuidv4(),
         channels: {
-          create: [
-            { name: `${profile.name}'s channel`, profileId: profile.id },
-          ],
+          create: [{ name: '公共频道', profileId: profile.id }],
         },
         members: {
-          create: [
-            {profileId: profile.id, role: MemberRole.ADMIN}
-          ]
-        }
+          create: [{ profileId: profile.id, role: MemberRole.ADMIN }],
+        },
       },
     });
 
-    return NextResponse.json(server)
+    return NextResponse.json(server);
   } catch (error) {
     console.log('[SERVERS_POST]', error);
     return new NextResponse('Internal Error', { status: 500 });

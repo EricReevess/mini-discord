@@ -45,14 +45,14 @@ const InviteCodePage = async ({ params }: Props) => {
         create: [
           {
             profileId: profile.id,
-          },
+        },
         ],
       },
     },
   });
 
   if (server) {
-    redirect(`/server/${server.id}`);
+    redirect(`/servers/${server.id}`);
   }
 
   // todo 邀请接受界面

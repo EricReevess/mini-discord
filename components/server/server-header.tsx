@@ -41,6 +41,18 @@ const ServerHeader = ({ server, role }: Props) => {
     onOpen(ModalType.MEMBERS, { server });
   };
 
+  const handlerCreateChannel = () => {
+    onOpen(ModalType.CREATE_CHANNEL, { server });
+  };
+
+  const handleLeaveServer = () => {
+    onOpen(ModalType.LEAVE_SERVER, { server });
+  };
+
+  const handleDeleteServer = () => {
+    onOpen(ModalType.DELETE_SERVER, { server });
+  };
+
   return (
     <div>
       <DropdownMenu>
@@ -53,7 +65,10 @@ const ServerHeader = ({ server, role }: Props) => {
         <DropdownMenuContent className='w-56 space-y-[2px] text-xs font-medium text-black dark:bg-zinc-700 dark:text-neutral-400'>
           {isModerate && (
             <>
-              <DropdownMenuItem className='cursor-pointer px-3 py-2 text-sm'>
+              <DropdownMenuItem
+                onClick={handlerCreateChannel}
+                className='cursor-pointer px-3 py-2 text-sm'
+              >
                 创建频道
                 <PlusCircle className='ml-auto h-4 w-4' />
               </DropdownMenuItem>
@@ -86,12 +101,18 @@ const ServerHeader = ({ server, role }: Props) => {
           )}
           {isModerate && <DropdownMenuSeparator />}
           {isAdmin ? (
-            <DropdownMenuItem className='cursor-pointer px-3 py-2 text-sm text-rose-500'>
+            <DropdownMenuItem
+              onClick={handleDeleteServer}
+              className='cursor-pointer px-3 py-2 text-sm text-rose-500'
+            >
               删除服务器
               <Trash className='ml-auto h-4 w-4' />
             </DropdownMenuItem>
           ) : (
-            <DropdownMenuItem className='cursor-pointer px-3 py-2 text-sm text-rose-500'>
+            <DropdownMenuItem
+              onClick={handleLeaveServer}
+              className='cursor-pointer px-3 py-2 text-sm text-rose-500'
+            >
               离开服务器
               <LogOut className='ml-auto h-4 w-4' />
             </DropdownMenuItem>

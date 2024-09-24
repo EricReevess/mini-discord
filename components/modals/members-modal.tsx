@@ -19,7 +19,6 @@ import UserAvatar from '../user-avatar';
 import { MemberRole } from '@prisma/client';
 import {
   Check,
-  Gavel,
   Loader2,
   MoreVertical,
   Shield,
@@ -42,8 +41,10 @@ import {
 import { useRouter } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
 
-const ROLE_ICON_MAP = {
-  [MemberRole.GUEST]: <User className='size-4 text-zinc-600' />,
+export const ROLE_ICON_MAP = {
+  [MemberRole.GUEST]: (
+    <User className='size-4 text-zinc-600 dark:text-zinc-400' />
+  ),
   [MemberRole.MODERATOR]: <Shield className='size-4 text-green-600' />,
   [MemberRole.ADMIN]: <ShieldCheck className='size-4 text-blue-600' />,
 };
@@ -83,9 +84,9 @@ const MembersModal = () => {
       console.error(error);
       toast({
         title: '角色修改失败',
-        description: JSON.stringify(error),
+        description: (error as unknown as { message: string })?.message,
         variant: 'destructive',
-        duration: 1000,
+        duration: 2000,
       });
     } finally {
       setLoadingId('');
